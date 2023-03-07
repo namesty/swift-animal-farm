@@ -1,7 +1,7 @@
 import Foundation
 
 struct FunctionsTable {
-    func speak(animalPtr: UnsafeRawPointer, messagePtr: UnsafePointer<Int8>) {
+    let speak: @convention(c) (UnsafeRawPointer, UnsafePointer<Int8>) -> Void = { animalPtr, messagePtr in
         let length = strlen(messagePtr)
         let buffer = UnsafeBufferPointer(
                 start: messagePtr.withMemoryRebound(to: UInt8.self, capacity: length) { $0 },
