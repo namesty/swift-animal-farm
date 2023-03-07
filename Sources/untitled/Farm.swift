@@ -3,8 +3,13 @@ import Foundation
 class Farm {
     let farmPtr: UnsafeMutableRawPointer
 
-    init() {
-        functionsPtr.initialize(to: functionsMap as! NSMutableDictionary)
+    init(functionsTable: FunctionsTable) {
+        let functionsPtr = UnsafeMutableRawPointer.allocate(
+                byteCount: MemoryLayout<FunctionsTable>.size,
+                alignment: MemoryLayout<FunctionsTable>.alignment
+        )
+        functionsPtr.assumingMemoryBound(to: FunctionsTable.self).initialize(to: functionsTable)
+
         farmPtr = createFarmFunc(functionsPtr)
     }
 
@@ -17,7 +22,7 @@ class Farm {
     func getAnimal<T: AnyObject & Animal>(name: String) -> T {
         let animalNamePtr = name.withCString { $0 }
         let animalPtr = getAnimalFunc(farmPtr, animalNamePtr)
-        Unmanaged<T>.fromOpaque(animalPtr).takeUnretainedValue()
+        return Unmanaged<T>.fromOpaque(animalPtr).takeUnretainedValue()
     }
 
     func nativeSpeak(animalName: String, message: String) {
